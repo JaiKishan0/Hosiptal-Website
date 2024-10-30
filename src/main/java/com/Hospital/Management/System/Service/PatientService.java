@@ -1,51 +1,76 @@
 package com.Hospital.Management.System.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.Hospital.Management.System.Entity.Patient;
 import com.Hospital.Management.System.Repositries.PatientRepository;
+import com.Hospital.Management.System.dto.PatientDTO;
 import com.Hospital.Management.System.exceptions.ResourceNotFoundException;
 
 @Service
 public class PatientService {
 
-	@Autowired
+    @Autowired
     private PatientRepository patientRepository;
 
+    // Convert Patient entity to PatientDTO
+    private PatientDTO convertToDto(Patient patient) {
+        PatientDTO patientDTO = new PatientDTO();
+        patientDTO.setId(patient.getId());
+        patientDTO.setName(patient.getName());
+        patientDTO.setEmail(patient.getEmail());
+        patientDTO.setContact(patient.getContact()); // Mapping contact
+        return patientDTO;
+    }
+
+    // Convert PatientDTO to Patient entity
+    private Patient convertToEntity(PatientDTO patientDTO) {
+        Patient patient = new Patient();
+        patient.setId(patientDTO.getId());
+        patient.setName(patientDTO.getName());
+        patient.setEmail(patientDTO.getEmail());
+        patient.setContact(patientDTO.getContact()); // Mapping contact
+        return patient;
+    }
+
     // Create a new patient
-    public Patient createPatient(Patient patient) {
-        if (patient == null || patient.getName() == null) {
-            throw new NullPointerException();
-        }
-        return patientRepository.save(patient);
+    public PatientDTO createPatient(PatientDTO patientDTO) {
+        Patient patient = convertToEntity(patientDTO);
+        return convertToDto(patientRepository.save(patient));
     }
 
     // Retrieve a patient by ID
-    public Patient getPatientById(Long id) {
-        return patientRepository.findById(id).get();
-//                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
+    public PatientDTO getPatientById(Long id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
+        return convertToDto(patient);
     }
 
     // Retrieve all patients
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public List<PatientDTO> getAllPatients() {
+        return patientRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     // Update a patient
-    public Patient updatePatient(Long id, Patient patientDetails) {
-        Patient patient = getPatientById(id);  // Will throw if not found
-        patient.setName(patientDetails.getName());
-        patient.setEmail(patientDetails.getEmail());
-        patient.setContact(patientDetails.getContact());
-        return patientRepository.save(patient);
+    public PatientDTO updatePatient(Long id, PatientDTO patientDTO) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
+        patient.setName(patientDTO.getName());
+        patient.setEmail(patientDTO.getEmail());
+        patient.setContact(patientDTO.getContact());
+        return convertToDto(patientRepository.save(patient));
     }
 
     // Delete a patient by ID
     public void deletePatient(Long id) {
-        Patient patient = getPatientById(id);  // Will throw if not found
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
         patientRepository.delete(patient);
     }
 }
