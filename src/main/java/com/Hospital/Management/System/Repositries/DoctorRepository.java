@@ -6,4 +6,6 @@ import com.Hospital.Management.System.Entity.Doctor;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long>{
 
+
+
 }

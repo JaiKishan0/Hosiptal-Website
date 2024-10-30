@@ -1,49 +1,34 @@
 package com.Hospital.Management.System.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "prescriptions")
+@Data  // Lombok will generate getters and setters
 @AllArgsConstructor
 @NoArgsConstructor
 public class Prescription {
 
-	public Long getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    private String medicationDetails; 
 
-	public String getDetails() {
-		return details;
-	}
+    private String dosageInstructions;
 
-	public void setDetails(String details) {
-		this.details = details;
-	}
+    @OneToOne
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    private Appointment appointment;
 
-	public Appointment getAppointment() {
-		return appointment;
-	}
+    @ManyToOne
+    @JoinColumn(name = "doctor_id", referencedColumnName = "id")
+    private Doctor doctor; 
 
-	public void setAppointment(Appointment appointment) {
-		this.appointment = appointment;
-	}
-
-	@Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
-
-	    private String details;
-
-	    @OneToOne
-	    private Appointment appointment;
-
+    @ManyToOne
+    @JoinColumn(name = "patient_id", referencedColumnName = "id")
+    private Patient patient; 
 }

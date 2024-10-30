@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/patients")
+@RequestMapping("/patients")
 public class PatientController {
 
     @Autowired
     private PatientService patientService;
 
     // Endpoint to get all patients
-    @GetMapping
+    @GetMapping("/get-all-patients")
     public List<PatientDTO> getAllPatients() {
         return patientService.getAllPatients();
     }
@@ -27,7 +27,7 @@ public class PatientController {
     }
 
     // Endpoint to create a new patient
-    @PostMapping
+    @PostMapping("/create-new")
     public PatientDTO createPatient(@RequestBody PatientDTO patientDTO) {
         return patientService.createPatient(patientDTO);
     }
