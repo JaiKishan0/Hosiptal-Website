@@ -15,6 +15,13 @@ public class DoctorController {
 
     @Autowired
     private DoctorService doctorService;
+    
+    // Accept Appointment
+    @PostMapping("/appointments/{appointmentId}/accept")
+    public ResponseEntity<Appointment> acceptAppointment(@PathVariable Long appointmentId) {
+        Appointment acceptedAppointment = doctorService.acceptAppointment(appointmentId);
+        return ResponseEntity.ok(acceptedAppointment); // Return the accepted appointment
+    }
 
     // View Appointments
     @GetMapping("/{doctorId}/appointments")
@@ -72,4 +79,5 @@ public class DoctorController {
         double bill = doctorService.generateBill(appointmentId);
         return ResponseEntity.ok(bill);
     }
+
 }

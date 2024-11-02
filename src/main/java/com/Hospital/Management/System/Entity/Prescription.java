@@ -1,6 +1,7 @@
 package com.Hospital.Management.System.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,13 @@ public class Prescription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String medicationDetails; 
-
+    @NotNull
     private String dosageInstructions;
+
+    // New field for additional details
+    private String details;
 
     @OneToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")

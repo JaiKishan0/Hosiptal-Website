@@ -7,6 +7,15 @@ public class PrescriptionDTO {
     private String medication;
     private String dosage;
     private String instructions;
+    public Long getAppointmentId() {
+		return appointmentId;
+	}
+
+	public void setAppointmentId(Long appointmentId) {
+		this.appointmentId = appointmentId;
+	}
+
+	private Long appointmentId; // Added field for appointment ID
 
     // Getters and Setters
 

@@ -1,48 +1,112 @@
 package com.Hospital.Management.System.Service;
 
-import java.util.List;
+import com.Hospital.Management.System.Entity.Appointment;
+import com.Hospital.Management.System.Entity.Doctor;
+import com.Hospital.Management.System.Entity.Patient;
+import com.Hospital.Management.System.Repositries.AppointmentRepository;
+import com.Hospital.Management.System.Repositries.DoctorRepository;
+import com.Hospital.Management.System.Repositries.PatientRepository;
+import com.Hospital.Management.System.dto.AppointmentDTO;
+import com.Hospital.Management.System.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.Hospital.Management.System.Entity.Appointment;
-import com.Hospital.Management.System.Repositries.AppointmentRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AppointmentService {
 
-	@Autowired
-    private AppointmentRepository AppointmentRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
-	    // Create a new appointment
-	    public Appointment createAppointment(Appointment appointment) {
-	        if (appointment == null || appointment.getAppointmentDate() == null) {
-	            throw new NullPointerException();
-	        }
-	        return AppointmentRepository.save(appointment);
-	    }
+    @Autowired
+    private PatientRepository patientRepository;
 
-	    // Retrieve an appointment by ID
-	    public Appointment getAppointmentById(Long id) {
-	        return AppointmentRepository.findById(id).get();
-//	                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: "));
-	    }
+    @Autowired
+    private DoctorRepository doctorRepository;
 
-	    // Retrieve all appointments
-	    public List<Appointment> getAllAppointments() {
-	        return AppointmentRepository.findAll();
-	    }
+    // Convert Appointment entity to AppointmentDTO
+    private AppointmentDTO convertToDto(Appointment appointment) {
+        AppointmentDTO dto = new AppointmentDTO();
+        dto.setId(appointment.getId());
+        dto.setAppointmentDate(appointment.getAppointmentDate());
+        dto.setStatus(appointment.isCompleted() ? "Completed" : "Pending");
+        dto.setFee(appointment.getFee());
+        dto.setPatientId(appointment.getPatient().getId());
+        dto.setDoctorId(appointment.getDoctor().getId());
+        return dto;
+    }
 
-	    // Update an appointment
-	    public Appointment updateAppointment(Long id, Appointment appointmentDetails) {
-	        Appointment appointment = getAppointmentById(id);  // Will throw if not found
-	        appointment.setAppointmentDate(appointmentDetails.getAppointmentDate());
-	        appointment.setDoctor(appointmentDetails.getDoctor());
-	        appointment.setPatient(appointmentDetails.getPatient());
-	        return AppointmentRepository.save(appointment);
-	    }
+    // Convert AppointmentDTO to Appointment entity
+    private Appointment convertToEntity(AppointmentDTO dto) {
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setFee(dto.getFee());
+        appointment.setAccepted(dto.isAccepted());
+        appointment.setCompleted(dto.isCompleted());
 
-	    // Delete an appointment by ID
-	    public void deleteAppointment(Long id) {
-	        Appointment appointment = getAppointmentById(id);  // Will throw if not found
-	        AppointmentRepository.delete(appointment);
-	    }
+        // Set Patient and Doctor entities based on IDs
+        Patient patient = patientRepository.findById(dto.getPatientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + dto.getPatientId()));
+        Doctor doctor = doctorRepository.findById(dto.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + dto.getDoctorId()));
+
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        return appointment;
+    }
+
+    // Create a new appointment
+    public AppointmentDTO createAppointment(AppointmentDTO dto) {
+        if (dto == null || dto.getAppointmentDate() == null) {
+            throw new IllegalArgumentException("Appointment details cannot be null");
+        }
+        Appointment appointment = convertToEntity(dto);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        return convertToDto(savedAppointment);
+    }
+
+    // Retrieve an appointment by ID
+    public AppointmentDTO getAppointmentById(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
+        return convertToDto(appointment);
+    }
+
+    // Retrieve all appointments
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    // Update an appointment
+    public AppointmentDTO updateAppointment(Long id, AppointmentDTO dto) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
+
+        if (dto.getAppointmentDate() != null) {
+            appointment.setAppointmentDate(dto.getAppointmentDate());
+        }
+        if (dto.getFee() > 0) {
+            appointment.setFee(dto.getFee());
+        }
+        if (dto.isAccepted() != appointment.isAccepted()) {
+            appointment.setAccepted(dto.isAccepted());
+        }
+        if (dto.isCompleted() != appointment.isCompleted()) {
+            appointment.setCompleted(dto.isCompleted());
+        }
+
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+        return convertToDto(updatedAppointment);
+    }
+
+    // Delete an appointment by ID
+    public void deleteAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
+        appointmentRepository.delete(appointment);
+    }
 }

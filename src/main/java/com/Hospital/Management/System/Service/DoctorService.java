@@ -1,15 +1,20 @@
 package com.Hospital.Management.System.Service;
 
 import com.Hospital.Management.System.Entity.Appointment;
+import com.Hospital.Management.System.Entity.Doctor; // Import Doctor entity
 import com.Hospital.Management.System.Entity.Prescription;
 import com.Hospital.Management.System.exceptions.ResourceNotFoundException;
 import com.Hospital.Management.System.Repositries.AppointmentRepository;
+import com.Hospital.Management.System.Repositries.DoctorRepository; // Import DoctorRepository
 import com.Hospital.Management.System.Repositries.PrescriptionRepository;
+import com.Hospital.Management.System.dto.DoctorDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DoctorService {
@@ -19,6 +24,9 @@ public class DoctorService {
 
     @Autowired
     private PrescriptionRepository prescriptionRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository; // Add DoctorRepository
 
     // 1. View Appointments
     public List<Appointment> getDoctorAppointments(Long doctorId) {
@@ -70,6 +78,7 @@ public class DoctorService {
             throw new IllegalArgumentException("Dosage instructions cannot be empty");
         }
     }
+
     // Update Prescription
     public Prescription updatePrescription(Long prescriptionId, String medicationDetails, String dosageInstructions) {
         Prescription prescription = prescriptionRepository.findById(prescriptionId)
@@ -88,7 +97,7 @@ public class DoctorService {
             .orElseThrow(() -> new ResourceNotFoundException("Prescription not found for this appointment"));
     }
     
-    // Delete prescription 
+    // Delete Prescription 
     public void deletePrescription(Long prescriptionId) {
         if (!prescriptionRepository.existsById(prescriptionId)) {
             throw new ResourceNotFoundException("Prescription not found");
@@ -103,5 +112,63 @@ public class DoctorService {
 
         appointment.setAccepted(true); // Set the accepted status
         return appointmentRepository.save(appointment); // Save the updated appointment
+    }
+
+
+    // CRUD Operations for Doctor
+
+    // Create Doctor
+    // 1. Save Doctor
+    public DoctorDTO saveDoctor(DoctorDTO doctorDTO) {
+        // Convert DTO to Entity
+        Doctor doctor = new Doctor();
+        doctor.setName(doctorDTO.getName());
+        doctor.setSpecialization(doctorDTO.getSpecialization());
+        doctor.setContact(doctorDTO.getContact());
+
+        // Save the Doctor entity
+        Doctor savedDoctor = doctorRepository.save(doctor);
+
+        // Return saved Doctor as DTO
+        return new DoctorDTO(savedDoctor.getId(), savedDoctor.getName(), savedDoctor.getSpecialization(), savedDoctor.getContact());
+    }
+
+    // Get Doctor by ID
+    public Doctor getDoctorById(Long doctorId) {
+        return doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+    }
+
+    // Update Doctor
+    public Doctor updateDoctor(Long doctorId, Doctor doctorDetails) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+            .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+
+        // Update doctor fields
+        doctor.setName(doctorDetails.getName());
+        doctor.setSpecialization(doctorDetails.getSpecialization());
+        doctor.setContact(doctorDetails.getContact());
+        // Add more fields as necessary
+
+        return doctorRepository.save(doctor);
+    }
+
+    // Delete Doctor
+    public void deleteDoctor(Long doctorId) {
+        if (!doctorRepository.existsById(doctorId)) {
+            throw new ResourceNotFoundException("Doctor not found");
+        }
+        doctorRepository.deleteById(doctorId);
+    }
+    
+    //Get all Doctors
+    public List<DoctorDTO> getAllDoctors() {
+        List<Doctor> doctors = doctorRepository.findAll();
+        return doctors.stream().map(doctor -> new DoctorDTO(
+                doctor.getId(),
+                doctor.getName(),
+                doctor.getSpecialization(),
+                doctor.getContact()
+        )).collect(Collectors.toList());
     }
 }

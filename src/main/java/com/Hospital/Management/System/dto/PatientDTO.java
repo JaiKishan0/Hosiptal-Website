@@ -1,9 +1,14 @@
 package com.Hospital.Management.System.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class PatientDTO {
     private Long id;
+    @NotBlank(message = "Name is mandatory")
     private String name;
+    @NotBlank(message = "Name is Email")
     private String email;
+    @NotBlank(message = "Name is Contact")
     private String contact;
 
     // Getters and Setters

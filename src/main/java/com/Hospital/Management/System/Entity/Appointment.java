@@ -8,10 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "appointments")
+@Data // This annotation will generate getters and setters automatically
 @AllArgsConstructor
 @NoArgsConstructor
 public class Appointment {
@@ -23,7 +25,7 @@ public class Appointment {
     private LocalDateTime appointmentDate; // Date and time of the appointment
 
     private boolean accepted; // Indicates if the appointment is accepted
-    private boolean isCompleted; // Indicates if the appointment is completed
+    private boolean completed; // Indicates if the appointment is completed
     private double fee; // Represents the fee for the appointment
 
     @ManyToOne
@@ -32,60 +34,13 @@ public class Appointment {
     @ManyToOne
     private Doctor doctor; // The doctor for the appointment
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getAppointmentDate() {
-        return appointmentDate;
-    }
-
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
+    // Constructor for required fields
+    public Appointment(LocalDateTime appointmentDate, double fee, Patient patient, Doctor doctor) {
         this.appointmentDate = appointmentDate;
-    }
-
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    public boolean isCompleted() {
-        return isCompleted;
-    }
-
-    public void setCompleted(boolean isCompleted) {
-        this.isCompleted = isCompleted;
-    }
-
-    public double getFee() {
-        return fee;
-    }
-
-    public void setFee(double fee) {
         this.fee = fee;
-    }
-
-    public boolean isAccepted() {
-        return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+        this.patient = patient;
+        this.doctor = doctor;
+        this.accepted = false; // Default value
+        this.completed = false; // Default value
     }
 }
