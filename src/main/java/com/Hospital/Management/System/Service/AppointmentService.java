@@ -31,7 +31,7 @@ public class AppointmentService {
         AppointmentDTO dto = new AppointmentDTO();
         dto.setId(appointment.getId());
         dto.setAppointmentDate(appointment.getAppointmentDate());
-        dto.setStatus(appointment.isCompleted() ? "Completed" : "Pending");
+        dto.setSetStatus(appointment.isCompleted() ? "Completed" : "Pending");
         dto.setFee(appointment.getFee());
         dto.setPatientId(appointment.getPatient().getId());
         dto.setDoctorId(appointment.getDoctor().getId());
@@ -109,4 +109,19 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
         appointmentRepository.delete(appointment);
     }
+    public AppointmentDTO markAsCompleted(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
+        
+        // Set appointment as completed
+        appointment.setCompleted(true);
+        
+        // Save the updated appointment
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+        
+        // Convert to DTO and return
+        return convertToDto(updatedAppointment);
+    }
+
 }
+

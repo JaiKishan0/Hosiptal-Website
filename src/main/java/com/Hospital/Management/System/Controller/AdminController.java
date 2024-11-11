@@ -88,18 +88,18 @@ public class AdminController {
 
     // Appointment Endpoints
     @GetMapping("/appointments/{id}")
-    public Appointment getAppointmentById(@PathVariable Long id) {
+    public AppointmentDTO getAppointmentById(@PathVariable Long id) {
         return appointmentService.getAppointmentById(id);
     }
 
     @GetMapping("/appointments")
-    public List<Appointment> getAllAppointments() {
-        return appointmentService.getAllAppointments();
+    public List<AppointmentDTO> getAllAppointments() {
+        return (List<AppointmentDTO>) appointmentService.getAllAppointments();
     }
 
     @PostMapping("/appointments")
     public AppointmentDTO createAppointment (@RequestBody AppointmentDTO appointmentDTO) {
-        return appointmentService.save(appointmentDTO);
+        return appointmentService.createAppointment(appointmentDTO);
     }
 
     @DeleteMapping("/appointments/{id}")
@@ -119,8 +119,8 @@ public class AdminController {
     }
 
     @PostMapping("/prescriptions")
-    public PrescriptionDTO addPrescription(@RequestBody PrescriptionDTO prescriptionDTO) {
-        return prescriptionService.addPrescription(prescriptionDTO);
+    public PrescriptionDTO createPrescription(@RequestBody PrescriptionDTO prescriptionDTO) {
+        return prescriptionService.createPrescription(prescriptionDTO);
     }
 
     @DeleteMapping("/prescriptions/{id}")

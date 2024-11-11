@@ -8,6 +8,7 @@ public class AppointmentDTO {
     private Long doctorId; // ID of the doctor
     private LocalDateTime appointmentDate;
     private double fee; // Added fee to the DTO
+	private Object setStatus;
 
     // Getters and Setters
     public Long getId() {
@@ -50,7 +51,20 @@ public class AppointmentDTO {
         this.fee = fee; // Setter for fee
     }
 
-	public void setStatus(Object object) {
-		this.setStatus = object;
+	public Object getSetStatus() {
+		return setStatus;
 	}
+
+	public void setSetStatus(Object setStatus) {
+		this.setStatus = setStatus;
+	}
+
+	public boolean isAccepted() {
+		return false;
+	}
+
+	public boolean isCompleted() {
+		return false;
+	}
+
 }
