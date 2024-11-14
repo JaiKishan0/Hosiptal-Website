@@ -36,7 +36,7 @@ public class AppointmentController {
     }
 
     // Get all appointments (Only accessible by admins and doctors)
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN') or hasRole('DOCTOR')")
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
         List<AppointmentDTO> appointments = appointmentService.getAllAppointments();
