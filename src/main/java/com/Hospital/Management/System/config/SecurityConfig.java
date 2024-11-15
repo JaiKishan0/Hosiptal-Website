@@ -20,7 +20,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())  // Disable CSRF protection for APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/patients/create-new").permitAll()  // Allow access to this endpoint without authentication
+                .requestMatchers("/patients/create-new").permitAll()
+                    .requestMatchers("patients/get-all-patients").permitAll()
+                    .requestMatchers("/api/auth/login").permitAll()
+                    // Allow access to this endpoint without authentication
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
                 .requestMatchers("/api/patient/**").hasRole("PATIENT")

@@ -50,7 +50,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));  // Use the injected PasswordEncoder
-        user.setRole(Role.valueOf(userDTO.getRole().toUpperCase()));  // Role mapping
+//        user.setRole(Role.valueOf(userDTO.getRole().toUpperCase()));  // Role mapping
 
         // Save the user to the repository
         User savedUser = userRepository.save(user);
@@ -62,9 +62,8 @@ public class UserService implements UserDetailsService {
     // Convert User entity to UserDTO
     public UserDTO convertToDTO(User user) {
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
         userDTO.setUsername(user.getUsername());
-        userDTO.setRole(user.getRole().name());  // Ensure that role is mapped correctly
+//        userDTO.setRole(user.getRole().name());  // Ensure that role is mapped correctly
         return userDTO;
     }
 }

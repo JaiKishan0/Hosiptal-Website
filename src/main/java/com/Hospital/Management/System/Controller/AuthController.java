@@ -22,8 +22,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
         try {
+
             // Authenticate the user and generate JWT token
             String token = authService.authenticateUser(userDTO);
+            System.out.println(token);
 
             // Return the token in a well-structured response
             return ResponseEntity.ok().body(new ApiResponse("Login successful", token));
